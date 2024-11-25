@@ -4,15 +4,17 @@ import axios from 'axios';
 
 export default createStore({
   state: {
-    isAuthenticated: false,
-    user: null
+    isAuthenticated: sessionStorage.getItem('isAuthenticated') === 'true',
+    user: sessionStorage.getItem('user') || null
   },
   mutations: {
     setAuthenticated(state, status) {
       state.isAuthenticated = status;
+      sessionStorage.setItem('isAuthenticated', status);
     },
     setUser(state, user) {
       state.user = user;
+      sessionStorage.setItem('user', user);
     }
   },
   actions: {
@@ -25,14 +27,15 @@ export default createStore({
         } else {
           return response.data.msg
         }
-      } catch (error) {
-        throw new Error('Login failed');
+      } 
+      catch (error) {
+        console.log(error);
+        throw new Error(error);
       }
     },
     async register({ commit }, userData) {
       try {
         const response = await axios.post('http://127.0.0.1:5000/register', userData);
-        console.log(response.status)
         if (response.data.status === 'success') {
           commit('setAuthenticated', true);
         } else {
