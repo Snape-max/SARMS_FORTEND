@@ -15,7 +15,11 @@ export default createStore({
     setUser(state, user) {
       state.user = user;
       sessionStorage.setItem('user', user);
-    }
+    },
+    setToken(state, token) {
+      state.token = token;
+      sessionStorage.setItem('token', token);
+    },
   },
   actions: {
     async login({ commit }, credentials) {
@@ -24,6 +28,8 @@ export default createStore({
         if (response.data.status === 'success') {
           commit('setAuthenticated', true);
           commit('setUser', credentials.username);
+          commit('setToken', response.data.token);
+          console.log(response.data.token);
         } else {
           return response.data.msg
         }

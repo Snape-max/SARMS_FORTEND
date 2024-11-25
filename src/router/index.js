@@ -1,13 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
+import BrowseView from '@/components/BrowseView.vue'
+import UploadView from '@/components/UploadView.vue'
+import Dashboard from '@/components/Dashboard.vue'
 import store from '@/store'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    children: [
+      {
+        path: 'browse',
+        name: 'browse',
+        component: BrowseView,
+        meta: { title: '图片浏览' }
+
+      },
+      {
+        path: 'upload',
+        name: 'upload',
+        component: UploadView,
+        meta: { title: '上传图片' }
+      },
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: Dashboard,
+        meta: { title: '数据统计' }
+      }
+
+    ]
   },
   {
     path: '/auth',
@@ -24,7 +49,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.name === 'home') {
+  if (to.name === 'home' || to.name === 'browse' || to.name === 'upload' || to.name === 'dashboard') {
     if (!store.state.isAuthenticated) {
       // 如果未登录
       next({ name: 'auth' });
