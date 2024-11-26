@@ -92,7 +92,7 @@
                   console.log(msg);
                   ElMessage.error(msg);
                 } else {
-                  router.push({ name: 'home' });
+                  router.push({ name: 'dashboard' });
                   ElMessage.success('登录成功');
                 }
               } else {
@@ -161,7 +161,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.398); /* 暗色遮罩，透明度为 0.5 */
+  background-color: rgba(56, 56, 56, 0.175); /* 暗色遮罩，透明度为 0.5 */
   z-index: 1;
 }
   
@@ -169,7 +169,7 @@
     width: 400px;
     padding: 20px;
     z-index: 2;
-    background-color: rgba(255, 255, 255, 0.442);
+    background-color: rgb(255, 255, 255);
   }
   
   .card-header {
