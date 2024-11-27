@@ -105,7 +105,7 @@
                 }
               }
             } catch (error) {
-              ElMessage.error("登录失败");
+              ElMessage.error(isLogin.value ? '登录失败' : '注册失败');
             }
           } else {
             ElMessage.error('请填写所有字段');

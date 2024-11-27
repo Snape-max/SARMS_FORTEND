@@ -4,6 +4,7 @@ import AuthView from '../views/AuthView.vue'
 import BrowseView from '@/components/BrowseView.vue'
 import UploadView from '@/components/UploadView.vue'
 import Dashboard from '@/components/Dashboard.vue'
+import ImageView from '@/components/ImageView.vue'
 import store from '@/store'
 
 const routes = [
@@ -18,6 +19,12 @@ const routes = [
         component: BrowseView,
         meta: { title: '图片浏览' }
 
+      },
+      {
+        path: 'browse/:id',
+        name: 'image',
+        component: ImageView,
+        meta: { title: '图片详情' }
       },
       {
         path: 'upload',

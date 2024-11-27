@@ -52,6 +52,9 @@ export default {
   computed: {
     breadcrumbItems() {
       const matched = this.$route.matched.filter(record => record.meta && record.meta.title);
+      if (this.$route.name === 'image'){
+        return [{ path: '/browse', name: '图片浏览' }, { path: `/browse/${this.$route.params.id}`, name: '详细信息' }];
+      }
       return matched.map(record => ({
         path: record.path,
         name: record.meta.title
