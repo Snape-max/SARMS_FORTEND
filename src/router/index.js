@@ -30,7 +30,7 @@ const routes = [
         path: 'upload',
         name: 'upload',
         component: UploadView,
-        meta: { title: '上传图片' }
+        meta: { title: '图片上传' }
       },
       {
         path: 'dashboard',

@@ -14,6 +14,15 @@
         </el-card>
       </el-col>
     </el-row>
+    
+    <div v-if="images.length == 0">
+      <el-result
+        icon="warning"
+        title="暂无图片"
+        sub-title="检索结果为空，您可以上传相关图片"
+      >
+    </el-result>
+    </div>
 
     <!-- 浮动按钮 -->
     <div class="floating-action-button">
@@ -55,10 +64,22 @@ export default {
   created() {
     this.fetchImages();
   },
+  watch: {
+    '$route.query': {
+      handler: 'fetchImages',
+      immediate: true // 立即触发一次handler
+    }
+  },
   methods: {
     async fetchImages() {
+      let filters = {}
+      if (this.$route.query){
+        filters = this.$route.query
+      }
+      console.log(filters)
       try {
         const response = await axios.get(`${config.apiUrl}/query`, {
+          params: filters,
           headers: {
             'x-access-token': `${this.token}`
           }
@@ -69,6 +90,7 @@ export default {
           img_name: image.img_name,
           img_date: image.img_date
         }));
+        console.log(this.images);
       } catch (error) {
         console.error('Error fetching images:', error);
       }
@@ -113,6 +135,7 @@ export default {
 
       if (this.selectedImages.length > 1) {
         ElMessage.warning('只能选择一张图片进行重命名');
+        this.selectedImages = [];
         return;
       }
 
@@ -130,6 +153,7 @@ export default {
       })
       .catch(() => {
         ElMessage.info('重命名取消');
+        this.selectedImages = [];
       });
     },
     renameImageOnServer(image, newName) {

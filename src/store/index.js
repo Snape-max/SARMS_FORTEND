@@ -28,9 +28,8 @@ export default createStore({
         const response = await axios.post(`${config.apiUrl}/login`, credentials);
         if (response.data.status === 'success') {
           commit('setAuthenticated', true);
-          commit('setUser', credentials.username);
+          commit('setUser', response.data.user);
           commit('setToken', response.data.token);
-          console.log(response.data.token);
         } else {
           return response.data.msg
         }

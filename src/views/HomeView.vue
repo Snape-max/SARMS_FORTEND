@@ -15,7 +15,7 @@
             </el-menu-item>
             <el-menu-item index="/upload">
               <el-icon><UploadFilled /></el-icon>
-              <span slot="title">上传图片</span>
+              <span slot="title">图片上传</span>
             </el-menu-item>
             <el-menu-item index="/browse">
               <el-icon><PictureFilled /></el-icon>
@@ -32,7 +32,47 @@
               <el-breadcrumb-item to="/dashboard">首页</el-breadcrumb-item>
               <el-breadcrumb-item v-for="item in breadcrumbItems" :key="item.path" :to="item.path">{{ item.name }}</el-breadcrumb-item>
             </el-breadcrumb>
+            <el-button @click="searchDialogVisible = true" style="margin-right: 40px;right: 0;position: absolute;" circle>
+              <el-icon><Search /></el-icon>
+            </el-button>
           </div>
+            <el-dialog v-model="searchDialogVisible" title="图片检索" width="800">
+              <el-form :inline="true" :model="searchForm" class="demo-form-inline">
+                <el-form-item label="开始日期">
+                  <el-date-picker
+                    v-model="searchForm.startDate"
+                    type="datetime"
+                    placeholder="选择开始日期时间"
+                  />
+                </el-form-item>
+                <el-form-item label="结束日期">
+                  <el-date-picker
+                    v-model="searchForm.endDate"
+                    type="datetime"
+                    placeholder="选择结束日期时间"
+                  />
+                </el-form-item>
+                <el-form-item label="文件名">
+                  <el-input v-model="searchForm.fileName" placeholder="请输入文件名" />
+                </el-form-item>
+                <el-form-item label="标签">
+                  <el-select v-model="searchForm.tags" multiple placeholder="请选择标签" style="width: 200px;">
+                    <el-option
+                      v-for="tag in availableTags"
+                      :key="tag.value"
+                      :label="tag.label"
+                      :value="tag.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="cancelSearch">取 消</el-button>
+                  <el-button type="primary" @click="performSearch">检 索</el-button>
+                </span>
+              </template>
+            </el-dialog>
           <router-view></router-view>
         </el-main>
       </el-container>
@@ -47,6 +87,22 @@ export default {
     return {
       isCollapsed: false, // 控制侧边栏的折叠状态
       logo: require('@/assets/logo.png'),
+      searchDialogVisible: false,
+      searchDialogVisible: false,
+      searchForm: {
+        startDate: '',
+        endDate: '',
+        fileName: '',
+        tags: []
+      },
+      availableTags: [
+        { value: 'ship', label: 'ship' },
+        { value: 'aircraft', label: 'aircraft' },
+        { value: 'car', label: 'car' },
+        { value: 'tank', label: 'tank' },
+        { value: 'bridge', label: 'bridge' },
+        { value: 'harbor', label: 'harbor' },
+      ]
     };
   },
   computed: {
@@ -64,6 +120,27 @@ export default {
   methods: {
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
+    },
+    performSearch() {
+      // 执行检索逻辑
+      const query = {
+        start_date: this.searchForm.startDate ? this.searchForm.startDate.toISOString().slice(0, -1):'',
+        end_date: this.searchForm.endDate ? this.searchForm.endDate.toISOString().slice(0, -1) : '',
+        name: this.searchForm.fileName,
+        tags: this.searchForm.tags.join(',')
+      };
+      this.$router.push({ name: 'browse', query : query})
+      this.searchDialogVisible = false;
+    },
+    cancelSearch() {
+      // 清空表单并关闭对话框
+      this.searchForm = {
+        startDate: '',
+        endDate: '',
+        fileName: '',
+        tags: []
+      };
+      this.searchDialogVisible = false;
     }
   }
 }
