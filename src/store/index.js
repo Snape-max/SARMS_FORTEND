@@ -1,7 +1,6 @@
 // src/store/index.js
 import { createStore } from 'vuex';
-import axios from 'axios';
-import config from '@/config';
+import api from '@/api';
 
 export default createStore({
   state: {
@@ -25,7 +24,7 @@ export default createStore({
   actions: {
     async login({ commit }, credentials) {
       try {
-        const response = await axios.post(`${config.apiUrl}/login`, credentials);
+        const response = await api.login(credentials);
         if (response.data.status === 'success') {
           commit('setAuthenticated', true);
           commit('setUser', response.data.user);
@@ -41,7 +40,7 @@ export default createStore({
     },
     async register({ commit }, userData) {
       try {
-        const response = await axios.post(`${config.apiUrl}/register`, userData);
+        const response = await api.register(userData);
         if (response.data.status === 'success') {
           commit('setAuthenticated', true);
         } else {

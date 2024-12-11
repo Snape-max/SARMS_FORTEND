@@ -8,6 +8,7 @@
             :min-scale="0.2"
             :preview-src-list="[imageDetail.img_url]"
             :initial-index="4"
+            @load="onImageLoad"
             fit="cover"
           />
           <el-image
@@ -23,30 +24,27 @@
           />
           <el-divider />
           <div class="info-container" v-if="imageDetail">
-            <div class="info">
-              <p><strong>文件名:</strong> {{ imageDetail.img_name }}</p>
-              <p><strong>上传时间:</strong> {{ formatDateTime(imageDetail.img_date) }}</p>
-              <p v-if="imageSize"><strong>图片尺寸:</strong> {{ imageSize.width }} x {{ imageSize.height }} px</p>
-
-              <div v-if="imageDetail.tags.length > 0">
-                <p>
-                  <strong>标签: </strong> 
-                  <el-tag
+            <el-descriptions
+              direction="vertical"
+              :column="4"
+              :size="size"
+              border
+            >
+              <el-descriptions-item label="文件名">{{ imageDetail.img_name }}</el-descriptions-item>
+              <el-descriptions-item label="上传时间" :span="2">{{ formatDateTime(imageDetail.img_date) }}</el-descriptions-item>
+              <el-descriptions-item label="图片尺寸"  v-if="imageSize">{{ imageSize.width }} x {{ imageSize.height }} px</el-descriptions-item>
+              <el-descriptions-item label="标签" :span="2">
+                <el-tag
                     v-for="item in imageDetail.tags"
                     :color=color[item]
                     effect="dark">
                     {{ item }} * {{ tags[item] }}
                   </el-tag>
-                </p>
-              </div>
-              <div v-if="imageDetail.tags.length == 0">
-                <p>
-                  <strong>标签: </strong> 
-                  暂无
-                </p>
-              </div>
-              <p><strong>上传者:</strong> {{imageDetail.author}}</p>
-            </div>
+              </el-descriptions-item>
+              <el-descriptions-item label="上传者">
+                {{imageDetail.author}}
+              </el-descriptions-item>
+            </el-descriptions>
           </div>
           <el-divider />
           <div v-if="imageDetail">
@@ -60,8 +58,8 @@
   </template>
   
   <script>
-  import axios from 'axios';
   import config from '../config';
+  import api from '@/api';
   import { ElMessage, ElMessageBox } from 'element-plus';
   
   export default {
@@ -77,16 +75,14 @@
     },
     created() {
       this.loadImageDetail();
+      
     },
     methods: {
       async loadImageDetail() {
         const imageId = this.$route.params.id;
         try {
           const filters = { id: imageId };
-          const response = await axios.post(`${config.apiUrl}/query`, null, {
-            params: filters,
-            headers: { 'x-access-token': this.token }
-          });
+          const response = await api.query(filters, this.token);
           this.tags = response.data[0].tags;
           this.imageDetail = {
             id: response.data[0].id,
@@ -144,12 +140,7 @@
               rename: value
             };
 
-            axios.post(`${config.apiUrl}/modify`, null, {
-              params: filters,
-              headers: {
-                'x-access-token': `${this.token}`
-              }
-            })
+            api.modeify(filters, this.token)
             .then(response => {
               ElMessage.success('图片重命名成功');
               this.loadImageDetail();
@@ -176,12 +167,7 @@
             delete: 'true'
           };
 
-          axios.post(`${config.apiUrl}/modify`, null, {
-            params: filters,
-            headers: {
-              'x-access-token': `${this.token}`
-            }
-          })
+          api.modeify(filters, this.token)
           .then(response => {
             ElMessage.success('图片删除成功');
             this.goBack()

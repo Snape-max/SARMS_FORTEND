@@ -32,7 +32,7 @@
               <el-breadcrumb-item to="/dashboard">首页</el-breadcrumb-item>
               <el-breadcrumb-item v-for="item in breadcrumbItems" :key="item.path" :to="item.path">{{ item.name }}</el-breadcrumb-item>
             </el-breadcrumb>
-            <el-button @click="searchDialogVisible = true" style="margin-right: 40px;right: 0;position: absolute;" circle>
+            <el-button size="large" @click="searchDialogVisible = true" style="margin-right: 20px;right: 0;position: absolute;" circle>
               <el-icon><Search /></el-icon>
             </el-button>
           </div>

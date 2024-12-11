@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import axios from 'axios';
 import config from '../config';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import api from '@/api';
 
 export default {
   name: 'BrowseView',
@@ -76,14 +76,9 @@ export default {
       if (this.$route.query){
         filters = this.$route.query
       }
-      console.log(filters)
       try {
-        const response = await axios.get(`${config.apiUrl}/query`, {
-          params: filters,
-          headers: {
-            'x-access-token': `${this.token}`
-          }
-        });
+        console.log(this.token)
+        const response = await api.query(filters, this.token)
         this.images = response.data.map(image => ({
           id: image.id,
           img_url: `${config.apiUrl}/${image.img_url}`,
@@ -162,12 +157,7 @@ export default {
         rename: newName
       };
 
-      axios.post(`${config.apiUrl}/modify`, null, {
-        params: filters,
-        headers: {
-          'x-access-token': `${this.token}`
-        }
-      })
+      api.modeify(filters, this.token)
       .then(response => {
         ElMessage.success('图片重命名成功');
         this.fetchImages(); // 重新获取图片列表
@@ -184,12 +174,7 @@ export default {
         delete: 'true'
       };
 
-      axios.post(`${config.apiUrl}/modify`, null, {
-        params: filters,
-        headers: {
-          'x-access-token': `${this.token}`
-        }
-      })
+      api.modeify(filters, this.token)
       .then(response => {
         ElMessage.success('图片删除成功');
         this.fetchImages(); // 重新获取图片列表
