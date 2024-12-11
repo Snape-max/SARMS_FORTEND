@@ -77,7 +77,6 @@ export default {
         filters = this.$route.query
       }
       try {
-        console.log(this.token)
         const response = await api.query(filters, this.token)
         this.images = response.data.map(image => ({
           id: image.id,
@@ -85,7 +84,6 @@ export default {
           img_name: image.img_name,
           img_date: image.img_date
         }));
-        console.log(this.images);
       } catch (error) {
         console.error('Error fetching images:', error);
       }
@@ -138,7 +136,7 @@ export default {
       ElMessageBox.prompt('请输入新的图片名称', '重命名', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        inputPattern: /^[a-zA-Z0-9\u4e00-\u9fa5\s]+$/,
+        inputPattern: /^[a-zA-Z0-9\u4e00-\u9fa5\s\.]+$/,
         inputErrorMessage: '图片名称不能包含特殊字符'
       })
       .then(({ value }) => {

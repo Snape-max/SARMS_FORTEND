@@ -26,6 +26,13 @@ export default {
                 'x-access-token': token 
             }
         })
+    },
+    info: (token) => {
+        return axios.post(`${API_URL}/info`,null, {
+            headers: {
+                'x-access-token': token 
+            }
+        })
     }
 }
 

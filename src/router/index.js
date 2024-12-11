@@ -5,11 +5,17 @@ import BrowseView from '@/components/BrowseView.vue'
 import UploadView from '@/components/UploadView.vue'
 import Dashboard from '@/components/Dashboard.vue'
 import ImageView from '@/components/ImageView.vue'
+import IndexView from '@/views/IndexView.vue'
 import store from '@/store'
 
 const routes = [
   {
     path: '/',
+    name: 'index',
+    component: IndexView
+  },
+  {
+    path: '/home',
     name: 'home',
     component: HomeView,
     children: [
@@ -56,6 +62,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  if (to.name === 'home') {
+    next({ name: 'dashboard' });
+  }
   if (to.name === 'home' || to.name === 'browse' || to.name === 'upload' || to.name === 'dashboard') {
     if (!store.state.isAuthenticated) {
       // 如果未登录

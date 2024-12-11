@@ -27,7 +27,7 @@
             <el-descriptions
               direction="vertical"
               :column="4"
-              :size="size"
+              :size="large"
               border
             >
               <el-descriptions-item label="文件名">{{ imageDetail.img_name }}</el-descriptions-item>
@@ -40,6 +40,12 @@
                     effect="dark">
                     {{ item }} * {{ tags[item] }}
                   </el-tag>
+                <el-tag
+                  v-if="isLabel === false"
+                  color="black"
+                  effect="dark">
+                  暂无
+                </el-tag>
               </el-descriptions-item>
               <el-descriptions-item label="上传者">
                 {{imageDetail.author}}
@@ -70,7 +76,8 @@
         token: sessionStorage.getItem('token'),
         imageSize: null, // 新增用于存储图片尺寸的数据属性
         color: config.CATEGORIES_COLOR,
-        tags: null
+        tags: null,
+        isLabel: true,
       };
     },
     created() {
@@ -83,6 +90,9 @@
         try {
           const filters = { id: imageId };
           const response = await api.query(filters, this.token);
+          if (response.data[0].labeled_image_url == null){
+            this.isLabel = false;
+          }
           this.tags = response.data[0].tags;
           this.imageDetail = {
             id: response.data[0].id,
@@ -130,7 +140,7 @@
         ElMessageBox.prompt('请输入新的图片名称', '重命名', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          inputPattern: /^[a-zA-Z0-9\u4e00-\u9fa5\s]+$/,
+          inputPattern: /^[a-zA-Z0-9\u4e00-\u9fa5\s\.]+$/,
           inputErrorMessage: '图片名称不能包含特殊字符'
         })
         .then(({ value }) => {

@@ -48,11 +48,9 @@ export default {
     },
     handleSuccess(response, file, fileList) {
       ElMessage.success('文件上传成功！');
-      console.log('Response:', response);
     },
     handleError(err, file, fileList) {
       ElMessage.error('文件上传失败！');
-      console.error('Error:', err);
     }
   }
 }

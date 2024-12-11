@@ -4,20 +4,20 @@
       <el-container>
         <el-aside :width="isCollapsed ? '60px' : '150px'" class="sidebar" close-on-click-outside="true">
           <el-menu :collapse="isCollapsed" :router="true" default-active="upload" class="menu">
-            <el-menu-item>
+            <el-menu-item @click="goToIndex">
               <img :src="logo" alt="Logo" class="logo" />
               <h1 v-if="!isCollapsed" class="title">SARMS</h1>
             </el-menu-item>
             <el-divider style="margin: 0; border-color: #222c30; transition: 0s;" />
-            <el-menu-item index="/dashboard">
+            <el-menu-item index="/home/dashboard">
               <el-icon><DataBoard /></el-icon>
               <span slot="title">数据统计</span>
             </el-menu-item>
-            <el-menu-item index="/upload">
+            <el-menu-item index="/home/upload">
               <el-icon><UploadFilled /></el-icon>
               <span slot="title">图片上传</span>
             </el-menu-item>
-            <el-menu-item index="/browse">
+            <el-menu-item index="/home/browse">
               <el-icon><PictureFilled /></el-icon>
               <span slot="title">图片浏览</span>
             </el-menu-item>
@@ -29,7 +29,7 @@
               <svg data-v-49e15297="" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="hamburger"><path data-v-49e15297="" d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM142.4 642.1L298.7 519a8.84 8.84 0 0 0 0-13.9L142.4 381.9c-5.8-4.6-14.4-.5-14.4 6.9v246.3a8.9 8.9 0 0 0 14.4 7z"></path></svg>
             </el-button>
             <el-breadcrumb separator="/">
-              <el-breadcrumb-item to="/dashboard">首页</el-breadcrumb-item>
+              <el-breadcrumb-item to="/home/dashboard">首页</el-breadcrumb-item>
               <el-breadcrumb-item v-for="item in breadcrumbItems" :key="item.path" :to="item.path">{{ item.name }}</el-breadcrumb-item>
             </el-breadcrumb>
             <el-button size="large" @click="searchDialogVisible = true" style="margin-right: 20px;right: 0;position: absolute;" circle>
@@ -109,7 +109,7 @@ export default {
     breadcrumbItems() {
       const matched = this.$route.matched.filter(record => record.meta && record.meta.title);
       if (this.$route.name === 'image'){
-        return [{ path: '/browse', name: '图片浏览' }, { path: `/browse/${this.$route.params.id}`, name: '详细信息' }];
+        return [{ path: '/home/browse', name: '图片浏览' }, { path: `/home/browse/${this.$route.params.id}`, name: '详细信息' }];
       }
       return matched.map(record => ({
         path: record.path,
@@ -141,6 +141,9 @@ export default {
         tags: []
       };
       this.searchDialogVisible = false;
+    },
+    goToIndex() {
+      this.$router.push({ path: '/' });
     }
   }
 }
