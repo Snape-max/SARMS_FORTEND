@@ -1,7 +1,7 @@
 <template>
   <div class="browse">
     <el-row :gutter="20" style="padding-bottom: 10px;">
-      <el-col :span="4" v-for="(image, index) in images" :key="index" style="padding-bottom: 10px;">
+      <el-col :span="4" v-for="(image, index) in paginatedImages" :key="index" style="padding-bottom: 10px;">
         <el-card :body-style="{ padding: '0px' }">
           <img :src="image.img_url" class="image" :id="image.id" @click="viewImageDetail(image)"/>
           <div 
@@ -17,11 +17,25 @@
     
     <div v-if="images.length == 0">
       <el-result
-        icon="warning"
-        title="暂无图片"
-        sub-title="检索结果为空，您可以上传相关图片"
+        title="Data Loading"
+        sub-title="Please wait for a moment"
       >
-    </el-result>
+        <template #icon>
+          <el-icon class="large-icon"><Loading /></el-icon>
+        </template>
+      </el-result>
+    </div>
+
+    <!-- 分页控件 -->
+    <div class="pagination-container">
+      <el-pagination
+        v-if="images.length > 0"
+        background
+        layout="prev, pager, next"
+        :total="images.length"
+        :page-size="pageSize"
+        @current-change="handlePageChange"
+      ></el-pagination>
     </div>
 
     <!-- 浮动按钮 -->
@@ -47,37 +61,55 @@
 </template>
 
 <script>
+import { ElMessage, ElMessageBox, ElIcon } from 'element-plus';
+import { Loading, Setting, Delete, Edit, Top } from '@element-plus/icons-vue';
 import config from '../config';
-import { ElMessage, ElMessageBox } from 'element-plus';
 import api from '@/api';
 
 export default {
   name: 'BrowseView',
+  components: {
+    ElIcon,
+    Loading,
+    Setting,
+    Delete,
+    Edit,
+    Top
+  },
   data() {
     return {
       images: [],
-      selectedImages: [], // 用于存储所有选中的图片
+      selectedImages: [],
       token: sessionStorage.getItem('token'),
       showOptions: false,
+      currentPage: 1,
+      pageSize: 24
     };
   },
   created() {
     this.fetchImages();
   },
+  computed: {
+    paginatedImages() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.images.slice(start, end);
+    }
+  },
   watch: {
     '$route.query': {
       handler: 'fetchImages',
-      immediate: true // 立即触发一次handler
+      immediate: true
     }
   },
   methods: {
     async fetchImages() {
-      let filters = {}
-      if (this.$route.query){
-        filters = this.$route.query
+      let filters = {};
+      if (this.$route.query) {
+        filters = this.$route.query;
       }
       try {
-        const response = await api.query(filters, this.token)
+        const response = await api.query(filters, this.token);
         this.images = response.data.map(image => ({
           id: image.id,
           img_url: `${config.apiUrl}/${image.img_url}`,
@@ -86,7 +118,15 @@ export default {
         }));
       } catch (error) {
         console.error('Error fetching images:', error);
+        this.images = [{
+          id: 'default',
+          img_url: require('@/assets/logo.png'),
+          img_name: 'Error Loading Images'
+        }];
       }
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
     },
     toggleImageSelection(image) {
       if (this.isImageSelected(image)) {
@@ -158,8 +198,8 @@ export default {
       api.modeify(filters, this.token)
       .then(response => {
         ElMessage.success('图片重命名成功');
-        this.fetchImages(); // 重新获取图片列表
-        this.selectedImages = []; // 清除选中状态
+        this.fetchImages();
+        this.selectedImages = [];
       })
       .catch(error => {
         console.error('Error renaming image:', error);
@@ -175,7 +215,7 @@ export default {
       api.modeify(filters, this.token)
       .then(response => {
         ElMessage.success('图片删除成功');
-        this.fetchImages(); // 重新获取图片列表
+        this.fetchImages();
       })
       .catch(error => {
         console.error('Error deleting image:', error);
@@ -214,8 +254,6 @@ export default {
   right: 120px;
 }
 
-
-
 .options {
   display: flex;
   justify-content: space-between;
@@ -225,5 +263,17 @@ export default {
 .selected {
   background-color: rgba(85, 99, 205, 0.455); /* 背景颜色稍微变暗 */
   border: 1px solid #3f51b5; /* 添加边框 */
+}
+
+/* 自定义图标大小 */
+.large-icon {
+  font-size: 48px; /* 调整图标大小 */
+}
+
+/* 分页控件居中 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 </style>
