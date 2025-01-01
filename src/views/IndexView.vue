@@ -158,7 +158,6 @@ export default {
           description: 'Information Support Troops.',
           logo: require('@/assets/partners/81.png')
         },
-
       ]
     };
   },
@@ -352,5 +351,31 @@ export default {
       height: auto;
       display: block;
       margin: 0 auto;
+    }
+
+    .partners {
+      padding: 50px 20px; /* 根据实际情况调整padding */
+      background: #f9fafb;
+      text-align: center;
+    }
+
+    .partners h2 {
+      margin-bottom: 30px;
+      font-size: 2rem;
+      color: #303133;
+    }
+
+    .partner-row {
+      justify-content: center; /* 使合作伙伴logo居中显示 */
+    }
+
+    .partner-logo {
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .partner-logo:hover {
+      transform: scale(1.05);
     }
 </style>
