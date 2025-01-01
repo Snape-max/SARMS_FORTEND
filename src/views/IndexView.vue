@@ -37,6 +37,17 @@
       </el-carousel>
     </section>
     <br>
+
+    <!-- 合作伙伴 -->
+    <section class="partners">
+      <h2>Our Partners</h2>
+      <el-row :gutter="20" class="partner-row">
+        <el-col :span="6" v-for="(partner, index) in partners" :key="index">
+          <img :src="partner.logo" :alt="partner.name" class="partner-logo" />
+        </el-col>
+      </el-row>
+    </section>
+
     <!-- 页脚 -->
     <footer class="footer">
       <p>&copy; 2024 Pengwei Wang&Wending Zhao. All rights reserved.</p>
@@ -77,7 +88,7 @@ export default {
             '基于日期、图片名称和标签进行快速检索，确保用户能够轻松找到所需图片。',
             '提供重命名和删除功能，保持资料库的整洁有序。'
           ],
-          color: '#e6f7ff' // 背景颜色
+          color: '#fff2e6' // 背景颜色
         },
         {
           title: '详细的图片浏览体验',
@@ -103,6 +114,21 @@ export default {
             '无论是界面布局还是功能模块，都可以根据实际业务需求进行调整，以适应不同的工作流和应用场景。'
           ],
           color: '#fff0f6' // 背景颜色
+        }
+      ],
+
+      partners: [
+        {
+          name: 'Peking University',
+          logo: '@/assets/logo.png'
+        },
+        {
+          name: 'China University of Geosciences',
+          logo: 'https://www.cug.edu.cn/images/logo.png'
+        },
+        {
+          name: 'National University of Defence Technology',
+          logo: 'https://www.cug.edu.cn/images/logo.png'
         }
       ]
     };
@@ -208,5 +234,31 @@ export default {
     text-align: center;
     background: #ffffff;
     color: #000000;
+    }
+
+    .partners {
+      padding: 50px 20px; /* 根据实际情况调整padding */
+      background: #f9fafb;
+      text-align: center;
+    }
+
+    .partners h2 {
+      margin-bottom: 30px;
+      font-size: 2rem;
+      color: #303133;
+    }
+
+    .partner-row {
+      justify-content: center; /* 使合作伙伴logo居中显示 */
+    }
+
+    .partner-logo {
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .partner-logo:hover {
+      transform: scale(1.05);
     }
 </style>
