@@ -1,27 +1,38 @@
 <template>
   <div class="browse">
-    <el-row :gutter="20" style="padding-bottom: 10px;">
-      <el-col :span="4" v-for="(image, index) in images" :key="index" style="padding-bottom: 10px;">
-        <el-card :body-style="{ padding: '0px' }">
-          <img :src="image.img_url" class="image" :id="image.id" @click="viewImageDetail(image)"/>
-          <div 
-            @click="toggleImageSelection(image)" 
-            :class="{ 'selected': isImageSelected(image) }" 
-            style="padding: 14px; font-size: 14px; cursor: pointer;"
-          >
-            <span>{{ image.img_name }}</span>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-    
-    <div v-if="images.length == 0">
+    <div v-if="loading" class="loading-indicator">
       <el-result
-        icon="warning"
-        title="暂无图片"
-        sub-title="检索结果为空，您可以上传相关图片"
+        title="Data Loading"
+        sub-title="Please wait while the images are being loaded."
       >
-    </el-result>
+        <template #icon>
+          <el-icon class="loading-icon"><Loading /></el-icon>
+        </template>
+      </el-result>
+    </div>
+    <div v-else>
+      <el-row :gutter="20" style="padding-bottom: 10px;">
+        <el-col :span="4" v-for="(image, index) in images" :key="index" style="padding-bottom: 10px;">
+          <el-card :body-style="{ padding: '0px' }">
+            <img :src="image.img_url" class="image" :id="image.id" @click="viewImageDetail(image)"/>
+            <div 
+              @click="toggleImageSelection(image)" 
+              :class="{ 'selected': isImageSelected(image) }" 
+              style="padding: 14px; font-size: 14px; cursor: pointer;"
+            >
+              <span>{{ image.img_name }}</span>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+      
+      <div v-if="images.length == 0 && !loading">
+        <el-result
+          icon="warning"
+          title="暂无图片"
+          sub-title="检索结果为空，您可以上传相关图片"
+        />
+      </div>
     </div>
 
     <!-- 浮动按钮 -->
@@ -47,45 +58,71 @@
 </template>
 
 <script>
+import { ElMessage, ElMessageBox, ElIcon } from 'element-plus';
+import { Loading, Setting, Delete, Edit, Top } from '@element-plus/icons-vue';
 import config from '../config';
-import { ElMessage, ElMessageBox } from 'element-plus';
 import api from '@/api';
 
 export default {
   name: 'BrowseView',
+  components: {
+    ElIcon,
+    Loading,
+    Setting,
+    Delete,
+    Edit,
+    Top
+  },
   data() {
     return {
       images: [],
-      selectedImages: [], // 用于存储所有选中的图片
+      selectedImages: [],
       token: sessionStorage.getItem('token'),
       showOptions: false,
+      loading: true,
+      page: 1,
+      pageSize: 20,
+      allLoaded: false,
     };
   },
   created() {
     this.fetchImages();
+    window.addEventListener('scroll', this.handleScroll);
   },
-  watch: {
-    '$route.query': {
-      handler: 'fetchImages',
-      immediate: true // 立即触发一次handler
-    }
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
     async fetchImages() {
-      let filters = {}
+      if (this.allLoaded) return;
+      this.loading = true;
+      let filters = { page: this.page, pageSize: this.pageSize };
       if (this.$route.query){
-        filters = this.$route.query
+        filters = { ...filters, ...this.$route.query };
       }
       try {
-        const response = await api.query(filters, this.token)
-        this.images = response.data.map(image => ({
+        const response = await api.query(filters, this.token);
+        const newImages = response.data.map(image => ({
           id: image.id,
           img_url: `${config.apiUrl}/${image.img_url}`,
           img_name: image.img_name,
           img_date: image.img_date
         }));
+        if (newImages.length < this.pageSize) {
+          this.allLoaded = true;
+        }
+        this.images = [...this.images, ...newImages];
+        this.page += 1;
       } catch (error) {
         console.error('Error fetching images:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleScroll() {
+      const bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
+      if (bottomOfWindow && !this.loading) {
+        this.fetchImages();
       }
     },
     toggleImageSelection(image) {
@@ -158,8 +195,8 @@ export default {
       api.modeify(filters, this.token)
       .then(response => {
         ElMessage.success('图片重命名成功');
-        this.fetchImages(); // 重新获取图片列表
-        this.selectedImages = []; // 清除选中状态
+        this.fetchImages();
+        this.selectedImages = [];
       })
       .catch(error => {
         console.error('Error renaming image:', error);
@@ -175,7 +212,7 @@ export default {
       api.modeify(filters, this.token)
       .then(response => {
         ElMessage.success('图片删除成功');
-        this.fetchImages(); // 重新获取图片列表
+        this.fetchImages();
       })
       .catch(error => {
         console.error('Error deleting image:', error);
@@ -214,8 +251,6 @@ export default {
   right: 120px;
 }
 
-
-
 .options {
   display: flex;
   justify-content: space-between;
@@ -223,7 +258,16 @@ export default {
 
 /* 选中状态的样式 */
 .selected {
-  background-color: rgba(85, 99, 205, 0.455); /* 背景颜色稍微变暗 */
-  border: 1px solid #3f51b5; /* 添加边框 */
+  background-color: rgba(85, 99, 205, 0.455);
+  border: 1px solid #3f51b5;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 50px 0;
+}
+
+.loading-icon {
+  font-size: 48px; /* 设置图标大小 */
 }
 </style>
